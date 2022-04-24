@@ -26,6 +26,12 @@ async function run() {
             res.send(products);
         })
         
+        app.get('/productCount', async(req, res) => {
+            const query = {};
+            const cursor = productsCollection.find(query);
+            const count = await cursor.count();
+            res.send({count});
+        })
         
         console.log('mongo is connected')
     }
