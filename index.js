@@ -19,17 +19,26 @@ async function run() {
         const productsCollection = client.db('dbJohn').collection('products');
         
         app.get('/product', async(req, res) => {
+            console.log('query', req.query);
+            const page = parseInt(req?.query?.page);
+            const size = parseInt(req?.query?.size);
+
             const query = {};
             const cursor = productsCollection.find(query);
-            const products = await cursor.toArray();
+            let products;
+            if (page || size){
+                products = await cursor.skip(page*size).limit(size).toArray();
+            }
+             else {
+                products = await cursor.toArray();
+             }
+            
 
             res.send(products);
         })
         
         app.get('/productCount', async(req, res) => {
-            const query = {};
-            const cursor = productsCollection.find(query);
-            const count = await cursor.count();
+            const count = await cursor.estimatedDocumentCount();
             res.send({count});
         })
         
