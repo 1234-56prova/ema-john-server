@@ -1,6 +1,8 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion } = require('mongodb');
 const cors = require('cors');
+require('dotenv').config();
+const { query } = require('express');
 const port = process.env.PORT || 5000;
 const app = express();
 
@@ -13,7 +15,18 @@ const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology:
 
 async function run() {
     try{
+        await client.connect();
         const productsCollection = client.db('dbJohn').collection('products');
+        
+        app.get('/product', async(req, res) => {
+            const query = {};
+            const cursor = productsCollection.find(query);
+            const products = await cursor.toArray();
+
+            res.send(products);
+        })
+        
+        
         console.log('mongo is connected')
     }
     finally {
